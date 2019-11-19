@@ -24,12 +24,13 @@ argvOpts = {
       'slave-mfa-serial',
       'slave-mfa-token',
    ],
-   'boolean': [ 'write-missing', 'write-differing', 'scan-for-extra', 'delete-extra' ],
+   'boolean': [ 'write-missing', 'write-differing', 'scan-for-extra', 'delete-extra', 'use-role'],
    'default': {
       'write-missing': false,
       'write-differing': false,
       'scan-for-extra': false,
       'delete-extra': false,
+      'use-role': false,
    },
    alias: {
       master: 'm',
@@ -148,6 +149,12 @@ function setupRoleRelatedCredentials(argPrefix, msg, masterCreds) {
 if (!_.isEmpty(argv.profile)) {
    console.log('Setting AWS credentials provider to use profile %s', argv.profile);
    AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: argv.profile });
+}
+
+// Use the credentials we can uave from STS if use-role is set
+if (argv['use-role']) {
+   console.log('Setting AWS credentials provider with role of the service/instance/function running this');
+   AWS.config.credentials = new AWS.ChainableTemporaryCredentials();
 }
 
 AWS.config.credentials = setupRoleRelatedCredentials('', 'for master', AWS.config.credentials);

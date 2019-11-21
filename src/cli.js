@@ -129,6 +129,8 @@ AWS.CredentialProviderChain.defaultProviders = [
   function () { return new AWS.ECSCredentials(); },
 ]
 
+AWS.config.credentials = new AWS.ECSCredentials();
+
 console.log('Assuming master role')
 AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['role-arn']}

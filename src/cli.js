@@ -133,7 +133,7 @@ if (argv['use-role']) {
 console.log('Assuming master role')
 AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['role-arn']},
-    masterCredentials: new AWS.ChainableTemporaryCredentials();
+    masterCredentials: new AWS.ChainableTemporaryCredentials()
 });
 
 if (!_.isEmpty(argv['slave-profile'])) {
@@ -144,7 +144,7 @@ if (!_.isEmpty(argv['slave-profile'])) {
 console.log('Assuming slave role')
 options.slaveCredentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['slave-role-arn']},
-    masterCredentials: new AWS.ChainableTemporaryCredentials();
+    masterCredentials: new AWS.ChainableTemporaryCredentials()
 });
 
 startupPromise

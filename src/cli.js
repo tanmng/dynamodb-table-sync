@@ -118,33 +118,6 @@ if (_.isNumber(argv.parallel)) {
    options.parallel = parseInt(argv.parallel, 10);
 }
 
-function setupRoleRelatedCredentials(argPrefix, msg, masterCreds) {
-   var params = { RoleArn: argv[argPrefix + 'role-arn'] },
-       creds = masterCreds;
-
-   if (_.isEmpty(params.RoleArn)) {
-      return creds;
-   }
-
-   if (_.isEmpty(argv[argPrefix + 'mfa-serial'])) {
-      console.log('Assuming role %s %s', params.RoleArn, msg);
-   } else {
-      params.SerialNumber = argv[argPrefix + 'mfa-serial'];
-      params.TokenCode = argv[argPrefix + 'mfa-token'];
-      console.log('Assuming role %s with MFA %s (%s) %s', params.RoleArn, params.SerialNumber, params.TokenCode, msg);
-   }
-
-   creds = new AWS.TemporaryCredentials(params, masterCreds);
-
-   // See jthomerson comments on https://github.com/aws/aws-sdk-js/issues/1064
-   // And subsequently: https://github.com/aws/aws-sdk-js/issues/1664
-   startupPromise = startupPromise.then(function() {
-      return Q.ninvoke(creds, 'refresh');
-   });
-
-   return creds;
-}
-
 // Set up master table (SDK default) credentials
 if (!_.isEmpty(argv.profile)) {
    console.log('Setting AWS credentials provider to use profile %s', argv.profile);
@@ -157,14 +130,22 @@ if (argv['use-role']) {
    AWS.config.credentials = new AWS.ChainableTemporaryCredentials();
 }
 
-AWS.config.credentials = setupRoleRelatedCredentials('', 'for master', AWS.config.credentials);
+console.log('Assuming master role')
+AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
+    params: {RoleArn: argv['role-arn']},
+    masterCredentials: new AWS.ChainableTemporaryCredentials();
+});
 
 if (!_.isEmpty(argv['slave-profile'])) {
    console.log('Setting AWS credentials provider to use profile %s for slaves', argv['slave-profile']);
    options.slaveCredentials = new AWS.SharedIniFileCredentials({ profile: argv['slave-profile'] });
 }
 
-options.slaveCredentials = setupRoleRelatedCredentials('slave-', 'for slaves', options.slaveCredentials || AWS.config.credentials);
+console.log('Assuming slave role')
+options.slaveCredentials = new AWS.ChainableTemporaryCredentials({
+    params: {RoleArn: argv['slave-role-arn']},
+    masterCredentials: new AWS.ChainableTemporaryCredentials();
+});
 
 startupPromise
    .then(function() {

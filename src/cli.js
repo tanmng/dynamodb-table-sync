@@ -135,7 +135,7 @@ options.slaveCredentials = new AWS.ChainableTemporaryCredentials({
 });
 
 console.log('Assuming master role: ', argv['role-arn']);
-options.sourceCredentials = new AWS.ChainableTemporaryCredentials({
+AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['role-arn']}
 });
 

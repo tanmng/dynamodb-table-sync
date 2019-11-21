@@ -131,7 +131,7 @@ AWS.CredentialProviderChain.defaultProviders = [
 
 AWS.config.credentials = new AWS.ECSCredentials();
 
-console.log('Assuming master role')
+console.log('Assuming master role: ', argv['role-arn']);
 AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['role-arn']}
 });
@@ -141,7 +141,7 @@ if (!_.isEmpty(argv['slave-profile'])) {
    options.slaveCredentials = new AWS.SharedIniFileCredentials({ profile: argv['slave-profile'] });
 }
 
-console.log('Assuming slave role')
+console.log('Assuming slave role: ', argv['slave-role-arn']);
 options.slaveCredentials = new AWS.ChainableTemporaryCredentials({
     params: {RoleArn: argv['slave-role-arn']}
 });

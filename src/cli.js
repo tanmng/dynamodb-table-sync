@@ -124,16 +124,14 @@ if (!_.isEmpty(argv.profile)) {
    AWS.config.credentials = new AWS.SharedIniFileCredentials({ profile: argv.profile });
 }
 
-// Use the credentials we can uave from STS if use-role is set
-if (argv['use-role']) {
-   console.log('Setting AWS credentials provider with role of the service/instance/function running this');
-   AWS.config.credentials = new AWS.ChainableTemporaryCredentials();
-}
+// Set up the default provider chain to use only ECS
+AWS.CredentialProviderChain.defaultProviders = [
+  function () { return new AWS.ECSCredentials(); },
+]
 
 console.log('Assuming master role')
 AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
-    params: {RoleArn: argv['role-arn']},
-    masterCredentials: new AWS.ChainableTemporaryCredentials()
+    params: {RoleArn: argv['role-arn']}
 });
 
 if (!_.isEmpty(argv['slave-profile'])) {
@@ -143,8 +141,7 @@ if (!_.isEmpty(argv['slave-profile'])) {
 
 console.log('Assuming slave role')
 options.slaveCredentials = new AWS.ChainableTemporaryCredentials({
-    params: {RoleArn: argv['slave-role-arn']},
-    masterCredentials: new AWS.ChainableTemporaryCredentials()
+    params: {RoleArn: argv['slave-role-arn']}
 });
 
 startupPromise

@@ -499,11 +499,14 @@ module.exports = Class.extend({
          console.log('Had %d items that were the same as the master', stats.sameAs);
          if (this._opts.deleteExtra || this._opts.scanForExtra) {
             console.log('Had %d items more than master', stats.extra);
+            console.log(stats.extras);
          } else {
             console.log('(we did not scan the slave to find if it had "extra" items that the master does not have)');
          }
          console.log('Had %d items that were different from the master', stats.differing);
+         console.log(stats.differings);
          console.log('Was missing %d items that the master had', stats.missing);
+         console.log(stats.missings);
       }.bind(this));
 
       return this._stats;

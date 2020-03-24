@@ -43,7 +43,15 @@ module.exports = Class.extend({
       this._opts = _.extend({ batchReadLimit: 50 }, opts);
 
       this._stats = _.reduce(this._slaves, function(stats, slave) {
-         stats[slave.id] = { extra: 0, sameAs: 0, differing: 0, missing: 0 };
+         stats[slave.id] = {
+             extra: 0,
+             extras: [],  // Actually store the list of extras
+             sameAs: 0,
+             differing: 0,
+             differings: [], // Actually store the differings
+             missing: 0,
+             missings: [] // Actually store the missings
+         };
          return stats;
       }, {});
    },
@@ -166,6 +174,8 @@ module.exports = Class.extend({
 
          if (!masterKey) {
             self._stats[slaveDef.id].extra = self._stats[slaveDef.id].extra + 1;
+             // Store the extra item
+            self._stats[slaveDef.id].extras.push(slaveBatch[slaveKey]);
             return self.slaveExtraItem(slaveKey, slaveDef);
          }
       }));
@@ -529,9 +539,16 @@ module.exports = Class.extend({
 
          if (!slaveItem) {
             self._stats[slaveDef.id].missing = self._stats[slaveDef.id].missing + 1;
+             // Store the missing item
+            self._stats[slaveDef.id].missings.push(masterItem);
             return self.slaveMissingItem(masterItem, slaveDef, key);
          } else if (self.isItemDifferent(masterItem, slaveItem)) {
             self._stats[slaveDef.id].differing = self._stats[slaveDef.id].differing + 1;
+            // Store the differing items
+            self._stats[slaveDef.id].differings.push({
+                m: masterItem,
+                s: slaveItem
+            });
             return self.slaveItemDiffers(masterItem, slaveItem, slaveDef, key);
          }
 

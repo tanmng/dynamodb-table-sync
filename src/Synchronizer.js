@@ -204,9 +204,6 @@ module.exports = Class.extend({
     */
    slaveMissingItem: function(masterItem, slaveDef, key) {
       console.log('ERROR: %s is missing item present in master table: %j', slaveDef.id, key);
-      if (this._opts.writeMissing) {
-         return this.writeItem(masterItem, slaveDef);
-      }
    },
 
    /**
@@ -227,9 +224,6 @@ module.exports = Class.extend({
       // TODO: output the differences
       // console.log('master', masterItem);
       // console.log('slave', slaveItem);
-      if (this._opts.writeDiffering) {
-         return this.writeItem(masterItem, slaveDef);
-      }
    },
 
    /**
@@ -261,10 +255,6 @@ module.exports = Class.extend({
     */
    slaveExtraItem: function(key, slaveDef) {
       console.log('ERROR: slave %s had an item that was not in the master table: %j', slaveDef.id, key);
-
-      if (this._opts.deleteExtra) {
-         return this.deleteItem(key, slaveDef);
-      }
    },
 
    /**
@@ -275,7 +265,8 @@ module.exports = Class.extend({
     */
    writeItem: function(item, tableDef) {
       console.log('Writing item to %s: %j', tableDef.id, this._makeKeyFromItem(item));
-      return Q.ninvoke(tableDef.docs, 'put', { TableName: tableDef.name, Item: _.omit(item, REPLICATION_FIELDS) });
+      console.log('Feature disabled');
+      // return Q.ninvoke(tableDef.docs, 'put', { TableName: tableDef.name, Item: _.omit(item, REPLICATION_FIELDS) });
    },
 
    /**
@@ -287,8 +278,8 @@ module.exports = Class.extend({
     */
    deleteItem: function(key, tableDef) {
       console.log('Deleting item from %s: %j', tableDef.id, key);
-
-      return Q.ninvoke(tableDef.docs, 'delete', { TableName: tableDef.name, Key: key });
+      console.log('Feature disabled');
+      // return Q.ninvoke(tableDef.docs, 'delete', { TableName: tableDef.name, Key: key });
    },
 
    /**

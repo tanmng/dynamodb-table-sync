@@ -104,6 +104,7 @@ options = {
    ignoreAtts: argv['ignore-atts'],
    startingKey: argv['starting-key'],
    reportBucket: argv['report-bucket'],
+   startingTime: new Date(),
 };
 
 if (_.isNumber(argv['scan-limit'])) {

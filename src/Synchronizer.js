@@ -516,28 +516,46 @@ module.exports = Class.extend({
         try {
             fd = fs.openSync('report.md', 'w');
             fs.appendFileSync(fd, '# Backup validation report\n', 'utf8');
-            fs.appendFileSync(fd, '## Process overview\n', 'utf8');
+            fs.appendFileSync(fd, 'This is a validation report on backup of dynamoDB table for VeridataEDC project. Report was generated at ' + (new Date()).toISOString() + '\n', 'utf8');
+            fs.appendFileSync(fd, '## Overview\n', 'utf8');
+
+            fs.appendFileSync(fd, '### Basic information\n', 'utf8');
+            fs.appendFileSync(fd, '* We compared the content between table `' + this._master.id + '` and `' + slave.id + '`\n', 'utf8');
+            // TODO - Correct the snapshot name
+            fs.appendFileSync(fd, '* Table `' + slave.id + '` was created from the latest snapshots of `' + this._master.id + '`, which is `BackupValidation-Demo` on `03/24/2020 @ 4:51am (UTC)` `\n', 'utf8');
+            fs.appendFileSync(fd, '* Effectively this is a comparison between the aforementioned backup and the production table - `' + this._master.id + '`\n', 'utf8');
+
+            fs.appendFileSync(fd, '### Process time line\n', 'utf8');
+            fs.appendFileSync(fd, '* Comparison process started on `' + this._opts.startingTime.toISOString() + '`\n', 'utf8');
+            fs.appendFileSync(fd, '* Comparison process ended on `' + (new Date()).toISOString() + '` \n', 'utf8');
+
+            fs.appendFileSync(fd, '## Comparison overview\n', 'utf8');
+            fs.appendFileSync(fd, '* The table restored from snapshot has **' + stats.sameAs + '** item(s) **that are the same** as the production.\n', 'utf8');
+            fs.appendFileSync(fd, '* The table restored from snapshot has **' + stats.extra + '** item(s) **that are the extra** comparing to the production.\n', 'utf8');
+            fs.appendFileSync(fd, '* The table restored from snapshot does NOT contain **' + stats.missing + '** item(s) **that are in the production**.\n', 'utf8');
+            fs.appendFileSync(fd, '* The table restored from snapshot has **' + stats.differing + '** item(s) **that are different** comparing to the production.\n', 'utf8');
+
             fs.appendFileSync(fd, '## Comparison details\n', 'utf8');
 
             fs.appendFileSync(fd, '### Same item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.sameAs + '** item(s) **that are the same** as the original.\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.sameAs + '** item(s) **that are the same** as the production.\n', 'utf8');
 
             fs.appendFileSync(fd, '### Extra item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.extra + '** item(s) **that are the extra** in the backup.\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.extra + '** item(s) **that are the extra** comparing to the production table.\n', 'utf8');
             fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.extras, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
             fs.appendFileSync(fd, '```\n', 'utf8');
 
             fs.appendFileSync(fd, '### Missing item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot does not contain **' + stats.missing + '** item(s) **that are in the original**.\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot does not contain **' + stats.missing + '** item(s) **that are in the production**.\n', 'utf8');
             fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.missings, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
             fs.appendFileSync(fd, '```\n', 'utf8');
 
             fs.appendFileSync(fd, '### Different item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.differing + '** item(s) **that are different** comparing to the original.\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.differing + '** item(s) **that are different** comparing to the production.\n', 'utf8');
             fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.differings, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
@@ -550,7 +568,8 @@ module.exports = Class.extend({
             if (fd !== undefined)
                 fs.closeSync(fd);
 
-            var report_file_name = 'unrestricted-validation-report.md';
+            // TODO - Correct the snapshot name
+            var report_file_name = 'unrestricted-validation-report/' + this._master.id + '-BackupValidation-Demo' + '.md';
             // Upload the file onto S3
             console.log('Uploading report to bucket ' + this._opts.reportBucket + ' under the name' + report_file_name);
 

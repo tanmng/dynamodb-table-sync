@@ -519,25 +519,25 @@ module.exports = Class.extend({
             fs.appendFileSync(fd, '## Comparison details\n', 'utf8');
 
             fs.appendFileSync(fd, '### Same item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has ' + stats.sameAs + ' item(s) **that are the same** as the original.\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.sameAs + '** item(s) **that are the same** as the original.\n', 'utf8');
 
             fs.appendFileSync(fd, '### Extra item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has ' + stats.extra + ' item(s) **that are the extra** in the backup.\n', 'utf8');
-            fs.appendFileSync(fd, '```\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.extra + '** item(s) **that are the extra** in the backup.\n', 'utf8');
+            fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.extras, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
             fs.appendFileSync(fd, '```\n', 'utf8');
 
             fs.appendFileSync(fd, '### Missing item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has ' + stats.missing + ' item(s) **that are missing** from the original.\n', 'utf8');
-            fs.appendFileSync(fd, '```\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot does not contain **' + stats.missing + '** item(s) **that are in the original**.\n', 'utf8');
+            fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.missings, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
             fs.appendFileSync(fd, '```\n', 'utf8');
 
             fs.appendFileSync(fd, '### Different item(s)\n', 'utf8');
-            fs.appendFileSync(fd, 'The table restored from snapshot has ' + stats.differing + ' item(s) **that are different** comparing to the original.\n', 'utf8');
-            fs.appendFileSync(fd, '```\n', 'utf8');
+            fs.appendFileSync(fd, 'The table restored from snapshot has **' + stats.differing + '** item(s) **that are different** comparing to the original.\n', 'utf8');
+            fs.appendFileSync(fd, '```json\n', 'utf8');
             fs.appendFileSync(fd, JSON.stringify(stats.differings, null, 2), 'utf8');
             fs.appendFileSync(fd, '\n', 'utf8');
             fs.appendFileSync(fd, '```\n', 'utf8');
@@ -591,8 +591,8 @@ module.exports = Class.extend({
             self._stats[slaveDef.id].differing = self._stats[slaveDef.id].differing + 1;
             // Store the differing items
             self._stats[slaveDef.id].differings.push({
-                m: masterItem,
-                s: slaveItem
+                production: masterItem,
+                backup: slaveItem
             });
             return self.slaveItemDiffers(masterItem, slaveItem, slaveDef, key);
          }

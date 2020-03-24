@@ -4,6 +4,7 @@ var _ = require('underscore'),
     fs = require('fs'),
     Q = require('q'),
     AWS = require('aws-sdk'),
+    s3 = new AWS.S3,
     Class = require('class.extend'),
     Counter = require('./lib/Counter'),
     REPLICATION_FIELDS = [ 'aws:rep:updateregion', 'aws:rep:updatetime', 'aws:rep:deleting' ];
@@ -548,6 +549,28 @@ module.exports = Class.extend({
         } finally {
             if (fd !== undefined)
                 fs.closeSync(fd);
+
+            var report_file_name = 'unrestricted-validation-report.md';
+            // Upload the file onto S3
+            console.log('Uploading report to bucket ' + this._opts.reportBucket + ' under the name' + report_file_name);
+
+            // Read content from the file
+            const fileContent = fs.readFileSync('report.md');
+
+            // Setting up S3 upload parameters
+            const params = {
+                Bucket: this._opts.reportBucket,
+                Key: report_file_name,
+                Body: fileContent
+            };
+
+            // Uploading files to the bucket
+            s3.upload(params, function(err, data) {
+                if (err) {
+                    throw err;
+                }
+                console.log(`File uploaded successfully. ${data.Location}`);
+            });
         }
       }.bind(this));
 

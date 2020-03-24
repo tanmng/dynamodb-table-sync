@@ -23,6 +23,7 @@ argvOpts = {
       'slave-role-arn',
       'slave-mfa-serial',
       'slave-mfa-token',
+      'report-bucket',
    ],
    'boolean': [ 'write-missing', 'write-differing', 'scan-for-extra', 'delete-extra', 'use-role'],
    'default': {
@@ -102,6 +103,7 @@ options = {
    scanForExtra: argv['scan-for-extra'],
    ignoreAtts: argv['ignore-atts'],
    startingKey: argv['starting-key'],
+   reportBucket: argv['report-bucket'],
 };
 
 if (_.isNumber(argv['scan-limit'])) {

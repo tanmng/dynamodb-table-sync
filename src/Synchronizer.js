@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('underscore'),
+    fs = require('fs'),
     Q = require('q'),
     AWS = require('aws-sdk'),
     Class = require('class.extend'),
@@ -508,6 +509,25 @@ module.exports = Class.extend({
          console.log('Was missing %d items that the master had', stats.missing);
          console.log(stats.missings);
       }.bind(this));
+
+      let fd;
+
+      // Unrestricted report
+      try {
+        fd = fs.openSync('report.md', 'a');
+        fs.appendFileSync(fd, '# Backup validation report\n', 'utf8');
+        fs.appendFileSync(fd, '## Process overview\n', 'utf8');
+        fs.appendFileSync(fd, '## Comparison details\n', 'utf8');
+        fs.appendFileSync(fd, '### Same item(s)\n', 'utf8');
+        fs.appendFileSync(fd, '### More item(s)\n', 'utf8');
+        fs.appendFileSync(fd, '### Missing item(s)\n', 'utf8');
+        fs.appendFileSync(fd, '### Different item(s)\n', 'utf8');
+      } catch (err) {
+        /* Handle the error */
+      } finally {
+        if (fd !== undefined)
+            fs.closeSync(fd);
+      }
 
       return this._stats;
    },
